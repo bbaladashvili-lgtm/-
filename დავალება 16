@@ -1,0 +1,172 @@
+export type Todo = {
+  id: number;
+  text: string;
+  time: string;
+  completed: boolean;
+};
+import TodoApp from "./components/TodoApp";
+
+export default function App() {
+  return <TodoApp />;
+}
+import { useState } from "react";
+import { Todo } from "../types";
+import TodoInput from "./TodoInput";
+import TodoItem from "./TodoItem";
+
+const initialTodos: Todo[] = [
+  { id: 1, text: "Dinner", time: "Today at 8:00 PM", completed: false },
+  { id: 2, text: "Walk with Coby", time: "Today at 3:30 PM", completed: false },
+  { id: 3, text: "Buy Groceries", time: "Today at 10:00 AM", completed: false },
+  { id: 4, text: "Go to repair shop", time: "Today at 9:00 AM", completed: false },
+];
+
+export default function TodoApp() {
+  const [todos, setTodos] = useState<Todo[]>(initialTodos);
+
+  const addTodo = (text: string) => {
+    const newTodo: Todo = {
+      id: Date.now(),
+      text,
+      time: "Today",
+      completed: false,
+    };
+    setTodos([newTodo, ...todos]);
+  };
+
+  const toggleTodo = (id: number) => {
+    setTodos(
+      todos.map((t) =>
+        t.id === id ? { ...t, completed: !t.completed } : t
+      )
+    );
+  };
+
+  return (
+    <div style={styles.container}>
+      <h1 style={styles.title}>Todo List</h1>
+
+      <TodoInput onAdd={addTodo} />
+
+      <div style={styles.list}>
+        {todos.map((todo) => (
+          <TodoItem key={todo.id} todo={todo} onToggle={toggleTodo} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const styles: Record<string, React.CSSProperties> = {
+  container: {
+    maxWidth: 400,
+    margin: "50px auto",
+    fontFamily: "sans-serif",
+  },
+  title: {
+    fontSize: 28,
+    marginBottom: 20,
+  },
+  list: {
+    marginTop: 20,
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+  },
+};
+import { useState } from "react";
+
+export default function TodoInput({
+  onAdd,
+}: {
+  onAdd: (text: string) => void;
+}) {
+  const [value, setValue] = useState("");
+
+  const handleAdd = () => {
+    if (!value.trim()) return;
+    onAdd(value);
+    setValue("");
+  };
+
+  return (
+    <div style={styles.wrapper}>
+      <input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="Add new task..."
+        style={styles.input}
+      />
+      <button onClick={handleAdd} style={styles.button}>
+        +
+      </button>
+    </div>
+  );
+}
+
+const styles: Record<string, React.CSSProperties> = {
+  wrapper: {
+    display: "flex",
+    gap: 10,
+  },
+  input: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 8,
+    border: "1px solid #ccc",
+  },
+  button: {
+    width: 40,
+    borderRadius: 8,
+    border: "none",
+    background: "#4f46e5",
+    color: "white",
+    fontSize: 20,
+    cursor: "pointer",
+  },
+};
+import { Todo } from "../types";
+
+export default function TodoItem({
+  todo,
+  onToggle,
+}: {
+  todo: Todo;
+  onToggle: (id: number) => void;
+}) {
+  return (
+    <div style={styles.item} onClick={() => onToggle(todo.id)}>
+      <div>
+        <div style={todo.completed ? styles.doneText : styles.text}>
+          {todo.text}
+        </div>
+        <div style={styles.time}>{todo.time}</div>
+      </div>
+
+      <input type="checkbox" checked={todo.completed} readOnly />
+    </div>
+  );
+}
+
+const styles: Record<string, React.CSSProperties> = {
+  item: {
+    display: "flex",
+    justifyContent: "space-between",
+    padding: 12,
+    border: "1px solid #eee",
+    borderRadius: 10,
+    cursor: "pointer",
+  },
+  text: {
+    fontSize: 16,
+  },
+  doneText: {
+    fontSize: 16,
+    textDecoration: "line-through",
+    color: "gray",
+  },
+  time: {
+    fontSize: 12,
+    color: "#888",
+  },
+};
