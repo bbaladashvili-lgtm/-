@@ -1,0 +1,109 @@
+import FAQ from "./components/FAQ";
+import styles from "./App.module.css";
+
+export default function App() {
+  return (
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <h1>FAQ</h1>
+        <FAQ />
+      </div>
+    </div>
+  );
+}
+.container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f3f4ff;
+  padding: 20px;
+}
+
+.card {
+  width: 100%;
+  max-width: 600px;
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+import { useState } from "react";
+import styles from "./FAQ.module.css";
+
+const data = [
+  { q: "What is this project?", a: "This is a FAQ accordion component." },
+  { q: "How does it work?", a: "Click on a question to open or close the answer." },
+  { q: "Is it responsive?", a: "Yes, it works on mobile and desktop." },
+  { q: "Can I use it anywhere?", a: "Yes, it's reusable and simple." }
+];
+
+export default function FAQ() {
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const toggle = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
+  return (
+    <div className={styles.wrapper}>
+      {data.map((item, index) => (
+        <div key={index} className={styles.item}>
+          
+          <div className={styles.question} onClick={() => toggle(index)}>
+            {item.q}
+            <span>{openIndex === index ? "−" : "+"}</span>
+          </div>
+
+          {openIndex === index && (
+            <div className={styles.answer}>
+              {item.a}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.question {
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 10px 0;
+}
+
+.answer {
+  padding: 10px 0;
+  color: #555;
+}
+
+/* 📱 Mobile responsive */
+@media (max-width: 600px) {
+  .card {
+    padding: 20px;
+  }
+
+  .question {
+    font-size: 14px;
+  }
+
+  .answer {
+    font-size: 13px;
+  }
+}
