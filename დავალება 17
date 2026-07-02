@@ -1,0 +1,111 @@
+interfaces.ts
+export interface IUser {
+  id: number;
+  name: string;
+  username: string;
+  email: string;
+  phone: string;
+  website: string;
+  company: {
+    name: string;
+  };
+}
+App.tsx
+import { useEffect, useState } from "react";
+import axios from "axios";
+import "./App.css";
+import { IUser } from "./interfaces";
+
+function App() {
+  const [users, setUsers] = useState<IUser[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    axios
+      .get<IUser[]>("https://jsonplaceholder.typicode.com/users")
+      .then((response) => {
+        setUsers(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
+
+  const filteredUsers = users.filter((user) =>
+    user.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div className="container">
+      <h1>Users</h1>
+
+      <input
+        type="text"
+        placeholder="Search user..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+
+      <div className="cards">
+        {filteredUsers.map((user) => (
+          <div className="card" key={user.id}>
+            <h2>{user.name}</h2>
+            <p>
+              <strong>Username:</strong> {user.username}
+            </p>
+            <p>
+              <strong>Email:</strong> {user.email}
+            </p>
+            <p>
+              <strong>Phone:</strong> {user.phone}
+            </p>
+            <p>
+              <strong>Website:</strong> {user.website}
+            </p>
+            <p>
+              <strong>Company:</strong> {user.company.name}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default App;
+App.css
+.container {
+  max-width: 1100px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card h2 {
+  margin-bottom: 10px;
+}
+
+npm install axios
+
+import axios from "axios";
