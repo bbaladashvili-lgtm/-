@@ -1,0 +1,189 @@
+export interface IUser {
+  avatar_url: string;
+  name: string | null;
+  login: string;
+  created_at: string;
+  bio: string | null;
+  public_repos: number;
+  followers: number;
+  following: number;
+  location: string | null;
+  blog: string;
+  twitter_username: string | null;
+  company: string | null;
+}
+import { useState } from "react";
+import axios from "axios";
+import "./App.css";
+import { IUser } from "./interfaces/IUser";
+
+function App() {
+  const [username, setUsername] = useState("");
+  const [user, setUser] = useState<IUser | null>(null);
+  const [error, setError] = useState("");
+  const [dark, setDark] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const getUser = async () => {
+    if (!username) return;
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const res = await axios.get<IUser>(
+        `https://api.github.com/users/${username}`
+      );
+
+      setUser(res.data);
+    } catch {
+      setUser(null);
+      setError("No results");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (date: string) => {
+    return new Date(date).toDateString().slice(4);
+  };
+
+  return (
+    <div className={dark ? "app dark" : "app"}>
+      <header className="header">
+        <h1>devfinder</h1>
+        <button onClick={() => setDark(!dark)}>
+          {dark ? "LIGHT" : "DARK"}
+        </button>
+      </header>
+
+      <div className="search">
+        <input
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Search GitHub username..."
+        />
+        <button onClick={getUser}>Search</button>
+      </div>
+
+      {loading && <p>Loading...</p>}
+      {error && <p className="error">{error}</p>}
+
+      {user && (
+        <div className="card">
+          <img src={user.avatar_url} />
+
+          <div className="info">
+            <h2>{user.name || user.login}</h2>
+            <p className="username">@{user.login}</p>
+            <p className="date">Joined {formatDate(user.created_at)}</p>
+
+            <p className="bio">
+              {user.bio || "This profile has no bio"}
+            </p>
+
+            <div className="stats">
+              <div>
+                <p>Repos</p>
+                <strong>{user.public_repos}</strong>
+              </div>
+              <div>
+                <p>Followers</p>
+                <strong>{user.followers}</strong>
+              </div>
+              <div>
+                <p>Following</p>
+                <strong>{user.following}</strong>
+              </div>
+            </div>
+
+            <div className="links">
+              <p>📍 {user.location || "Not Available"}</p>
+              <p>🔗 {user.blog || "Not Available"}</p>
+              <p>🐦 {user.twitter_username || "Not Available"}</p>
+              <p>🏢 {user.company || "Not Available"}</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f6f8ff;
+}
+
+.app {
+  max-width: 700px;
+  margin: auto;
+  padding: 20px;
+  color: #2b3442;
+}
+
+.dark {
+  background: #141d2f;
+  color: white;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search {
+  display: flex;
+  margin: 20px 0;
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.search input {
+  flex: 1;
+  border: none;
+  outline: none;
+}
+
+.search button {
+  background: #0079ff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+}
+
+.card {
+  display: flex;
+  gap: 20px;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.card img {
+  width: 100px;
+  border-radius: 50%;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-between;
+  background: #f6f8ff;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 10px 0;
+}
+
+.links p {
+  margin: 5px 0;
+}
+
+.error {
+  color: red;
+}
